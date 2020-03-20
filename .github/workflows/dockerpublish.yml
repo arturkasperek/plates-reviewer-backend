@@ -53,4 +53,4 @@ jobs:
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: Run deploy script
-        run: cat scripts/deploy.sh | ssh deploy-user@35.153.202.221
+        run: cat scripts/deploy.sh | ssh -o "IdentitiesOnly=yes" -i ~/.ssh/id_rsa deploy-user@35.153.202.221
