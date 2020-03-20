@@ -39,3 +39,11 @@ jobs:
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+  deploy_prod:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Set private key
+        run: echo $SSH_PRIVATE_KEY > ~/id_rsa
+      - name: Run deploy script
+        run: cat deploy.sh | ssh deploy-user@35.153.202.221
