@@ -50,6 +50,7 @@ jobs:
         with:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           name: id_rsa
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
 
       - name: Run deploy script
         run: cat scripts/deploy.sh | ssh deploy-user@35.153.202.221
