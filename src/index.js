@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = 8080;
 const S3Upload = require('./services/S3Upload');
 
 if ( !process.env.AWS_ACCESS_KEY ) {
@@ -20,7 +20,7 @@ app.post('/add-report', async (req, res) => {
 
 async function init() {
 
-  app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+  app.listen(port, () => console.log(`Plates reviewer API listening on port ${port}!`));
 }
 
 init();
