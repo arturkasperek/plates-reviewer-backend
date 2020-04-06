@@ -7,7 +7,6 @@ const uuid = require('uuid');
 const ID = process.env.AWS_ACCESS_KEY;
 const SECRET = process.env.AWS_SECRET_ACCESS_KEY;
 const BUCKET_NAME = process.env.BUCKET_NAME;
-const REGION = process.env.REGION;
 
 
 const s3 = new AWS.S3({
@@ -24,7 +23,7 @@ const uploadS3 = multer({
       cb(null, {fieldName: file.fieldname})
     },
     key: (req, file, cb) => {
-      cb(null, uuid.v4() + '-' + file.originalname)
+      cb(null, `car-images/${uuid.v4()}-${file.originalname}`);
     }
   })
 });
