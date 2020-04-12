@@ -1,6 +1,23 @@
 require('dotenv').config();
 require('reflect-metadata');
 const express = require('express');
+const { get } = require('lodash');
+const bodyParser = require('body-parser');
+const Joi = require('@hapi/joi');
+const AWS = require('aws-sdk');
+const validator = require('express-joi-validation').createValidator({});
+
+const ID = process.env.AWS_ACCESS_KEY;
+const SECRET = process.env.AWS_SECRET_ACCESS_KEY;
+const REGION = process.env.REGION;
+
+const rekognition = new AWS.Rekognition({
+  apiVersion: '2016-06-27',
+  accessKeyId: ID,
+  secretAccessKey: SECRET,
+  region: REGION,
+});
+
 
 //TODO refactor
 if ( !process.env.AWS_ACCESS_KEY ) {
@@ -13,25 +30,56 @@ const app = express();
 const port = 8080;
 const S3Upload = require('./services/S3Upload');
 
+app.use(bodyParser.json());
 
 app.post('/upload-car-image', S3Upload.single('image'), async (req, res) => {
+  const detectionResult = await rekognition.detectText({
+    Image: {
+      S3Object: {
+        Bucket: req.file.bucket,
+        Name: req.file.key,
+      }
+    }
+  }).promise();
+  const platesProposal = get(detectionResult, 'TextDetections', []).find(i => {
+    return i.DetectedText.length > 3;
+  });
+
   res.json({
     url: req.file.location,
+    platesProposal: get(platesProposal, 'DetectedText'),
   });
 });
 
-app.post('/report', async (req, res) => {
-  const report = await addReport();
+app.post('/report', validator.body(
+  Joi.object({
+    lat: Joi.number().min(-180).max(180).required(),
+    long: Joi.number().min(-180).max(180).required(),
+    comment: Joi.string(),
+    mediaURL: Joi.string().uri().required(),
+    platesNumber: Joi.string().required(),
+  })
+), async (req, res) => {
+  const report = await addReport(req.body);
 
   res.json(report);
 });
 
-app.get('/report', async (req, res) => {
-  const reports = await getReports();
+app.get('/report', validator.query(
+  Joi.object({
+    skip: Joi.number(),
+    limit: Joi.number(),
+    search: Joi.string(),
+  })
+), async (req, res) => {
+  const skip = get(req.query, 'skip', 0);
+  const limit = get(req.query, 'limit', 10);
+  const search = get(req.query, 'search', '');
+  const reports = await getReports(skip, limit, search);
 
   res.json({
-    total: 999,
-    result: reports,
+    total: reports.total,
+    result: reports.result,
   });
 });
 

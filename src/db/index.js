@@ -1,5 +1,6 @@
 const ReportDAOInit = require('./models/Report');
 const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 const DB_NAME = process.env.DB_NAME;
 const DB_USER = process.env.DB_USER;
@@ -19,17 +20,31 @@ const initDB = async () => {
   await ReportDAO.sync();
 };
 
-const addReport = async () => {
+const addReport = async (data) => {
   return await ReportDAO.create({
-    comment: 'test',
-    long: 12.3,
-    lat: 12.0,
-    mediaURL: 'https://plates-reviewer-storage-2.s3.amazonaws.com/car-images/e0c20ff2-3a5b-4cd7-a49f-e3b7c79c50ed-35285831_2190705280956701_1595269940292616192_o.jpg',
+    comment: data.comment,
+    long: data.long,
+    lat: data.lat,
+    mediaURL: data.mediaURL,
+    platesNumber: data.platesNumber,
   });
 };
 
-const getReports = () => {
-  return ReportDAO.findAll();
+const getReports = async (skip, limit, search) => {
+  const result = await ReportDAO.findAndCountAll({
+    where: {
+      platesNumber: {
+        [Op.like]: `%${search}%`,
+      },
+    },
+    limit,
+    offset: skip,
+  });
+  console.log('result is ', result);
+  return {
+    result: result.rows.map(i=>i.get()),
+    total: result.count,
+  };
 };
 
 module.exports = {

@@ -24,6 +24,10 @@ module.exports = (sequelize) => (
       type: Sequelize.STRING,
       allowNull: false,
     },
+    platesNumber: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
   }, {
     // options
   })
