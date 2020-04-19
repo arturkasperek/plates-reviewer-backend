@@ -47,8 +47,26 @@ const getReports = async (skip, limit, search) => {
   };
 };
 
+const removeReport = async (id) => {
+  const result =  await ReportDAO.destroy({
+    where: {
+      id,
+    }
+  });
+
+  if ( result === 0 ) {
+    throw {
+      resCode: 400,
+      message: 'Invalid ID',
+    };
+  } else {
+    return id;
+  }
+};
+
 module.exports = {
   addReport,
   getReports,
-  initDB
+  initDB,
+  removeReport,
 };
