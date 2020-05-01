@@ -13,7 +13,7 @@ let ReportDAO;
 const initDB = async () => {
   const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     host: DB_HOST,
-    dialect: 'mysql',
+    dialect: 'mariadb',
     port: DB_PORT,
   });
   ReportDAO = ReportDAOInit(sequelize);
