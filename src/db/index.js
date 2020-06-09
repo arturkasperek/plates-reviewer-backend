@@ -32,6 +32,7 @@ const addReport = async (data) => {
 
 const getReports = async (skip, limit, search) => {
   const result = await ReportDAO.findAndCountAll({
+    order: [['updatedAt', 'DESC']],
     where: {
       platesNumber: {
         [Op.like]: `%${search}%`,
