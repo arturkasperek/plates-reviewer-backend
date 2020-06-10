@@ -76,7 +76,7 @@ app.get('/report', validator.query(
   })
 ), async (req, res) => {
   const skip = get(req.query, 'skip', 0);
-  const limit = get(req.query, 'limit', 10);
+  const limit = get(req.query, 'limit', 9999);
   const search = get(req.query, 'search', '');
   const reports = await getReports(skip, limit, search);
 
